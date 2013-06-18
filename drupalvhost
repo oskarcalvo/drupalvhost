@@ -1,0 +1,91 @@
+<VirtualHost *:80>
+  ServerName domain.com
+  ServerAlias static.domain.com 
+  DocumentRoot /pat/to/document/root
+  <Directory /pat/to/Directory>
+    Options Indexes FollowSymLinks MultiViews
+    AllowOverride All
+    Order allow,deny
+    allow from all
+  </Directory>
+
+  KeepAlive On
+  MaxKeepAliveRequests 200
+  KeepAliveTimeout 5
+
+  AddOutputFilterByType DEFLATE text/css
+  AddOutputFilterByType Type DEFLATE text/plain
+  AddOutputFilterByType Type DEFLATE text/html
+  AddOutputFilterByType Type DEFLATE text/xml
+  AddOutputFilterByType Type DEFLATE text/css
+  AddOutputFilterByType Type DEFLATE application/xml
+  AddOutputFilterByType Type DEFLATE application/xhtml+xml
+  AddOutputFilterByType Type DEFLATE application/rss+xml
+  AddOutputFilterByType Type DEFLATE application/x-javascript
+  AddOutputFilterByType Type DEFLATE application/x-json
+
+  # Urls where I take the ideas to build this vhost
+  # http://www.symfony.es/documentacion/como-configurar-bien-apache-para-las-aplicaciones-symfony2/
+  # http://blog-das-oertchen.de/archive/201009/drupal-sinnvolle-optimierungen-teil-2
+  # http://snipplr.com/view/50146/
+  # http://serverfault.com/questions/120488/redirect-url-within-apache-virtualhost
+
+  
+  # Parallel Redirect
+  RewriteEngine on
+  
+  # This options let you to redirect the static content to the static 
+  RewriteCond %{REQUEST_URI} !(^/(.*)(.js|.css|.swf|.gif|.mp4|.ogv|.png|.jpg|.woff|.ttf)) [NC]
+  RewriteCond %{HTTP_ACCEPT} !(.*image.*|.*css.*|.*javascript.*) [NC]
+  RewriteCond %{HTTP_HOST} ^(static.domain.com)$ [NC]
+  RewriteRule ^(.*)$ http://www.domain.com$1 [L,R=301]
+
+  #If someone try to load the static subdomain url it will redirect to the main domain.
+  RewriteCond %{HTTP_HOST} ^static\.domain\.com$ [NC]
+  RewriteRule ^(.*)$ http://www.domain.com$1 [QSA,R=301,L]
+
+  <IfModule mod_expires.c>
+
+    ExpiresActive On
+    ExpiresDefault A259200
+
+    #Cachespecifiedfilesfor31days
+    <filesmatch "\.(ico|flv|jpg|jpeg|png|gif|swf)$">
+      Header set Cache-Control "max-age=2678400, public"
+    </filesmatch>
+    #CacheHTMLfilesforacouplehours
+    <filesmatch "\.(html|htm)$">
+      Header set Cache-Control "max-age=7200, private, must-revalidate"
+    </filesmatch>
+    #CachePDFsforaday
+    <filesmatch "\.(pdf)$">
+      Header set Cache-Control "max-age=86400, public"
+    </filesmatch>
+    #CacheCSSfor6days
+    <filesmatch "\.(css|css.gz)$">
+      Header set Cache-Control "max-age=518400, private"
+    </filesmatch>
+    #CacheJavascriptsfor31days
+    <filesmatch "\.(js|js.gz)$">
+      Header set Cache-Control "max-age=2678400, private"
+    </filesmatch>
+  </IfModule>
+
+  <IfModule mod_headers.c>
+    Header append Vary User-Agent env=!dont-vary
+
+    ExpiresActive On
+    ExpiresDefault "now plus 1 week"
+    ExpiresByType image/x-icon "now plus 1 month"
+    ExpiresByType image/gif "now plus 1 month"
+    ExpiresByType image/png "now plus 1 month"
+    ExpiresByType image/jpeg "now plus 1 month"
+    ExpiresByType application/x-javascript "now plus 1 month"
+    ExpiresByType application/javascript "now plus 1 month"
+    ExpiresByType text/javascript "now plus 1 month"
+    ExpiresByType text/css "now plus 1 month"
+
+    Header unset ETag
+  </IfModule>
+  FileETag None
+</VirtualHost>
