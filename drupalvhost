@@ -12,17 +12,16 @@
   KeepAlive On
   MaxKeepAliveRequests 200
   KeepAliveTimeout 5
-
+  
+  AddOutputFilterByType DEFLATE text/plain
+  AddOutputFilterByType DEFLATE text/html
+  AddOutputFilterByType DEFLATE text/xml
   AddOutputFilterByType DEFLATE text/css
-  AddOutputFilterByType Type DEFLATE text/plain
-  AddOutputFilterByType Type DEFLATE text/html
-  AddOutputFilterByType Type DEFLATE text/xml
-  AddOutputFilterByType Type DEFLATE text/css
-  AddOutputFilterByType Type DEFLATE application/xml
-  AddOutputFilterByType Type DEFLATE application/xhtml+xml
-  AddOutputFilterByType Type DEFLATE application/rss+xml
-  AddOutputFilterByType Type DEFLATE application/x-javascript
-  AddOutputFilterByType Type DEFLATE application/x-json
+  AddOutputFilterByType DEFLATE application/xml
+  AddOutputFilterByType DEFLATE application/xhtml+xml
+  AddOutputFilterByType DEFLATE application/rss+xml
+  AddOutputFilterByType DEFLATE application/x-javascript
+  AddOutputFilterByType DEFLATE application/x-json
 
   # Urls where I take the ideas to build this vhost
   # http://www.symfony.es/documentacion/como-configurar-bien-apache-para-las-aplicaciones-symfony2/
